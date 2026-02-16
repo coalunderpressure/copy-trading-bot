@@ -34,3 +34,6 @@
 2026-02-16 23:48 — [QA Planner] UAT doğrulama senaryosu parser+executor+state-store hattında çalıştırıldı; sonuç `execution_status: ok`, `final_state: executed`.
 2026-02-16 23:48 — [QA Planner] `data/state.db` üzerinde `source_message_id=9001` kaydı doğrulandı; durum kalıcılığı teyit edildi.
 2026-02-16 23:48 — [Security Guardian] Runtime artefaktlarının yanlışlıkla commitlenmesini önlemek için `.gitignore` güncellendi (`data/*.db`, `logs/`, `downloads/`).
+2026-02-16 23:53 — [Core Builder] Onay akışı sinyalin geldiği chat'e yönlendirildi; prompt/sonuç/reject/duplicate mesajları artık `msg.chat_id` üzerinden gidiyor.
+2026-02-16 23:53 — [Core Builder] Approval handler global dinlemeye alındı; komutlar sadece ilgili sinyalin beklediği chat'ten gelirse kabul ediliyor.
+2026-02-16 23:53 — [QA Planner] Regresyon testleri çalıştırıldı: `.venv\Scripts\python -m pytest -q` sonucu `9 passed`.

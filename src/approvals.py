@@ -1,6 +1,6 @@
 import asyncio
 from dataclasses import replace
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from telethon import events
 from telethon.client.telegramclient import TelegramClient
@@ -22,26 +22,29 @@ class ApprovalService:
         self.max_leverage = max_leverage
         self.pending: Dict[int, asyncio.Future] = {}
         self.pending_signals: Dict[int, TradeSignal] = {}
+        self.pending_chats: Dict[int, Any] = {}
         self._lock = asyncio.Lock()
 
     def register_handlers(self) -> None:
-        @self.client.on(events.NewMessage(chats=self.approval_chat_id))
+        @self.client.on(events.NewMessage())
         async def on_approval_command(event):
             text = (event.raw_text or "").strip()
             if not text.startswith("/"):
                 return
-            await self._handle_command(text)
+            await self._handle_command(text, event.chat_id)
 
-    async def request_approval(self, signal: TradeSignal) -> ApprovalDecision:
+    async def request_approval(self, signal: TradeSignal, approval_chat_id: Optional[Any] = None) -> ApprovalDecision:
         signal_id = signal.source_message_id or 0
+        target_chat = approval_chat_id if approval_chat_id is not None else self.approval_chat_id
         loop = asyncio.get_running_loop()
         future: asyncio.Future = loop.create_future()
 
         async with self._lock:
             self.pending[signal_id] = future
             self.pending_signals[signal_id] = signal
+            self.pending_chats[signal_id] = target_chat
 
-        await self.client.send_message(self.approval_chat_id, self._format_prompt(signal, signal_id))
+        await self.client.send_message(target_chat, self._format_prompt(signal, signal_id))
 
         try:
             decision: ApprovalDecision = await asyncio.wait_for(future, timeout=self.timeout_seconds)
@@ -57,8 +60,9 @@ class ApprovalService:
             async with self._lock:
                 self.pending.pop(signal_id, None)
                 self.pending_signals.pop(signal_id, None)
+                self.pending_chats.pop(signal_id, None)
 
-    async def _handle_command(self, text: str) -> None:
+    async def _handle_command(self, text: str, event_chat_id: Optional[int]) -> None:
         parts = text.split()
         command = parts[0].lower()
         signal_id = self._parse_signal_id(parts[1] if len(parts) > 1 else "")
@@ -67,7 +71,10 @@ class ApprovalService:
 
         async with self._lock:
             future = self.pending.get(signal_id)
+            expected_chat = self.pending_chats.get(signal_id)
         if future is None or future.done():
+            return
+        if expected_chat is not None and event_chat_id is not None and str(event_chat_id) != str(expected_chat):
             return
 
         if command == "/approve":

@@ -31,7 +31,7 @@ async def run() -> None:
     async def on_message(msg: IncomingMessage):
         if state_store.has_message(msg.message_id):
             await client.send_message(
-                settings.approval_chat_id,
+                msg.chat_id,
                 f"Signal #{msg.message_id} ignored: already processed.",
             )
             return
@@ -48,11 +48,11 @@ async def run() -> None:
         signal.source_message_id = msg.message_id
         state_store.mark_parsed(signal)
 
-        decision = await approvals.request_approval(signal)
+        decision = await approvals.request_approval(signal, approval_chat_id=msg.chat_id)
         if not decision.approved:
             state_store.mark_rejected(msg.message_id, decision)
             await client.send_message(
-                settings.approval_chat_id,
+                msg.chat_id,
                 f"Signal #{msg.message_id} rejected: {decision.reason}",
             )
             return
@@ -60,7 +60,7 @@ async def run() -> None:
         state_store.mark_approved(msg.message_id, decision)
         result = await executor.execute(decision.edited_signal or signal)
         state_store.mark_executed(msg.message_id, result)
-        await client.send_message(settings.approval_chat_id, f"Execution result: {result}")
+        await client.send_message(msg.chat_id, f"Execution result: {result}")
 
     register_channel_handler(client, settings, on_message)
     await client.start()

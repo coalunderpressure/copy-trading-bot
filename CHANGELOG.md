@@ -14,6 +14,9 @@
 - Testler tekrar çalıştırıldı: `.venv\\Scripts\\python -m pytest -q` sonucu `9 passed`.
 - Dry-run UAT state doğrulaması çalıştırıldı; `data/state.db` üzerinde `executed` durum kaydı teyit edildi.
 - Runtime artefaktları için `.gitignore` güncellendi: `data/*.db`, `logs/`, `downloads/`.
+- Onay mesaj/komut akışı statik `APPROVAL_CHAT_ID` yerine sinyalin geldiği chat'e yönlendirildi (`src/main.py`, `src/approvals.py`).
+- Approval komutları sadece ilgili sinyalin beklenen chat'inden geldiğinde işleniyor (`src/approvals.py`).
+- Regresyon testleri tekrar çalıştırıldı: `.venv\\Scripts\\python -m pytest -q` sonucu `9 passed`.
 
 ## 2026-02-15
 - Plan dokümanları konsolide edildi: `trading_bot_plan.md` master plan olarak güncellendi.
