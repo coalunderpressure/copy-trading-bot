@@ -1,0 +1,6 @@
+telethon>=1.36.0
+ccxt>=4.4.0
+python-dotenv>=1.0.1
+openai>=1.0.0
+jsonschema>=4.23.0
+pytest>=8.3.0

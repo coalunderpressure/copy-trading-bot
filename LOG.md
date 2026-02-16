@@ -1,0 +1,24 @@
+2026-02-15 18:45 — [Orchestrator] İki plan dosyası birleştirildi ve userbot-only mimariye göre `trading_bot_plan.md` güncellendi.
+2026-02-15 18:45 — [Orchestrator] Agent rolleri tanımlandı, `TASKS.md` oluşturuldu, takip akışı başlatıldı.
+2026-02-15 18:45 — [Core Builder] Başlangıç proje iskeleti için görev başlatıldı.
+2026-02-15 18:46 — [Core Builder] `src/` altında başlangıç modülleri eklendi (`main`, `config`, `listener`, `parser`, `approvals`, `executor`, `models`).
+2026-02-15 18:46 — [Core Builder] Listener Telethon `NewMessage` hattı hedef kanal filtresi ile bağlandı.
+2026-02-15 18:46 — [QA Planner] `python -m compileall src` ile sözdizim doğrulaması başarılı.
+2026-02-15 18:47 — [Core Builder] Parser katmanına strict JSON schema doğrulaması eklendi (`jsonschema`).
+2026-02-15 18:47 — [QA Planner] Parser güncellemesi sonrası derleme doğrulaması başarılı.
+2026-02-15 18:47 — [Orchestrator] Global `C:\Users\ceyca\.codex\CODEX.md` ve `C:\Users\ceyca\.codex\MEMORY.md` proje protokolüne göre güncellendi.
+2026-02-15 19:24 — [Core Builder] Userbot onay akışı eklendi (`/approve`, `/reject`, `/edit`) ve `main` akışına entegre edildi.
+2026-02-15 19:24 — [Core Builder] CCXT executor market/limit giriş, TP/SL hattı ve dry-run/risk policy kontrolleriyle güncellendi.
+2026-02-15 19:24 — [QA Planner] `INTEGRATION_TEST_PLAN.md` ve başlangıç test iskeleti (`tests/`) eklendi.
+2026-02-15 19:24 — [QA Planner] `python -m pytest -q` bağımlılıklar kurulu olmadığı için koleksiyon aşamasında başarısız oldu.
+2026-02-15 19:24 — [Security Guardian] Hızlı güvenlik taraması tamamlandı, bulgular ve düzeltmeler `SECURITY_REVIEW.md` dosyasına işlendi.
+2026-02-15 19:24 — [QA Planner] `python -m compileall src tests` başarılı.
+2026-02-15 19:24 — [Memory Keeper] Test bağımlılık hatası sonrası local/global `MEMORY.md` guardrail güncellendi.
+2026-02-15 19:33 — [QA Planner] Lokal `.venv` oluşturuldu, bağımlılıklar `requirements.txt` üzerinden kuruldu.
+2026-02-15 19:33 — [QA Planner] `.venv\Scripts\python -m pytest -q` sonucu: 4 passed.
+2026-02-15 19:33 — [Core Builder] İlk dry-run komutu `python -c` ile async sözdizimi hatası verdi; herestring + `python -` yaklaşımıyla düzeltildi.
+2026-02-15 19:33 — [Core Builder] `DRY_RUN` executor yürüyüş kontrolü örnek sinyal ile başarılı.
+2026-02-15 19:33 — [Memory Keeper] Async inline komut hatası dersi local ve global `MEMORY.md` dosyalarına eklendi.
+2026-02-15 20:58 — [Core Builder] `scripts/dry_run_smoke.py` eklendi; ilk koşuda `src` import yolu hatası alındı ve path bootstrap ile düzeltildi.
+2026-02-15 20:58 — [Core Builder] Smoke script tekrar çalıştırıldı, dry-run sonucu başarılı.
+2026-02-15 20:58 — [Orchestrator] Gerçek Telegram dry-run UAT adımları `RUNBOOK.md` dosyasına eklendi.
