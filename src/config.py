@@ -23,6 +23,7 @@ class Settings:
     default_leverage: int
     default_margin_mode: str
     fixed_position_usdt: float
+    paper_total_balance_usdt: float
     dry_run: bool
     max_leverage: int
     allowed_pairs: Optional[set[str]]
@@ -71,6 +72,7 @@ def load_settings() -> Settings:
         default_leverage=int(os.getenv("DEFAULT_LEVERAGE", "5")),
         default_margin_mode=os.getenv("DEFAULT_MARGIN_MODE", "isolated"),
         fixed_position_usdt=float(os.getenv("FIXED_POSITION_USDT", "50")),
+        paper_total_balance_usdt=float(os.getenv("PAPER_TOTAL_BALANCE_USDT", "50")),
         dry_run=os.getenv("DRY_RUN", "true").lower() == "true",
         max_leverage=int(os.getenv("MAX_LEVERAGE", "20")),
         allowed_pairs=allowed_pairs,

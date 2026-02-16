@@ -58,3 +58,9 @@
 2026-02-17 00:42 — [Orchestrator] Yeni görev tanımlandı: startup kartını emoji'li ve ID göstermeyen UX'e geçir (zorluk: kolay, efor: low).
 2026-02-17 00:42 — [Core Builder] `src/main.py` startup kartı emoji'li stile güncellendi; approval chat ID görünümü kaldırıldı, kanal etiketi entity üzerinden çözümleniyor.
 2026-02-17 00:42 — [QA Planner] Regresyon testleri tekrar çalıştırıldı: `.venv\Scripts\python -m pytest -q` sonucu `12 passed`.
+2026-02-17 00:50 — [Orchestrator] Yeni görev tanımlandı: onay öncesi pozisyon boyutu seçimi (%/USDT) ve paper balance akışı (zorluk: orta, efor: medium).
+2026-02-17 00:50 — [Core Builder] `src/bot_approvals.py` içine size yönetimi eklendi: inline `%25/%50/%100` seçimi ve `/size <id> <usdt|%>` komutu.
+2026-02-17 00:50 — [Core Builder] Onay kararı seçilen size ile signal'e işlendi (`position_size_usdt`), size seçilmeden `/approve` engelleniyor.
+2026-02-17 00:50 — [Core Builder] `src/executor.py` seçilen `position_size_usdt` değerini hesaplamaya bağladı; `paper_total_balance_usdt` üst sınır kontrolü eklendi.
+2026-02-17 00:50 — [Core Builder] `src/config.py`, `.env.example`, `RUNBOOK.md`, `src/main.py` paper balance=50 ve startup kartı bilgileriyle güncellendi.
+2026-02-17 00:50 — [QA Planner] Test/smoke tekrar çalıştırıldı: `pytest` sonucu `13 passed`, `scripts/dry_run_smoke.py` başarılı.

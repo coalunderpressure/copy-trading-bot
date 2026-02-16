@@ -34,6 +34,12 @@
 - Startup kartı emoji'li bir UX formatına güncellendi (`src/main.py`).
 - Kanal etiketi entity'den çözümlenerek ad/username gösteriliyor; ham chat ID görünümü kaldırıldı (`src/main.py`).
 - Approval chat alanı ID yerine kullanıcı dostu etiketle gösteriliyor (`src/main.py`).
+- Onay akışına pozisyon boyutu seçimi eklendi: inline `%25/%50/%100` butonları ve `/size <id> <usdt|%>` komutu (`src/bot_approvals.py`).
+- Size seçilmeden onay engellendi; onay kararında `position_size_usdt` sinyale işleniyor (`src/bot_approvals.py`, `src/models.py`).
+- Executor hesaplaması seçilen `position_size_usdt` ile çalışacak şekilde güncellendi ve `paper_total_balance_usdt` üst sınır kontrolü eklendi (`src/executor.py`, `src/config.py`).
+- Yeni ayar eklendi: `PAPER_TOTAL_BALANCE_USDT` (varsayılan 50) (`.env.example`, `src/config.py`).
+- Startup kartına paper bakiye bilgisi eklendi ve runbook yeni size akışıyla güncellendi (`src/main.py`, `RUNBOOK.md`).
+- Test sonucu `13 passed`, smoke script doğrulaması başarılı.
 
 ## 2026-02-15
 - Plan dokümanları konsolide edildi: `trading_bot_plan.md` master plan olarak güncellendi.

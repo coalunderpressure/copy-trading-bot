@@ -32,6 +32,7 @@ def _settings() -> Settings:
         default_leverage=5,
         default_margin_mode="isolated",
         fixed_position_usdt=50.0,
+        paper_total_balance_usdt=50.0,
         dry_run=True,
         max_leverage=20,
         allowed_pairs={"BTC/USDT"},

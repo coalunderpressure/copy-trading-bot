@@ -54,7 +54,7 @@ class ExchangeExecutor:
 
             side = "buy" if signal.direction == "LONG" else "sell"
             entry_price = self._entry_price(signal)
-            amount = await self._calculate_amount(signal.pair, entry_price)
+            amount = await self._calculate_amount(signal, entry_price)
             order_type = "market" if signal.order_type == "market" else "limit"
 
             order = await self._call_with_retry(
@@ -80,11 +80,12 @@ class ExchangeExecutor:
     async def close(self) -> None:
         await self.exchange.close()
 
-    async def _calculate_amount(self, symbol: str, entry_price: float) -> float:
-        ticker = await self._call_with_retry("fetch_ticker", lambda: self.exchange.fetch_ticker(symbol))
+    async def _calculate_amount(self, signal: TradeSignal, entry_price: float) -> float:
+        ticker = await self._call_with_retry("fetch_ticker", lambda: self.exchange.fetch_ticker(signal.pair))
         reference_price = entry_price or float(ticker["last"])
-        raw_amount = self.settings.fixed_position_usdt / reference_price
-        return float(self.exchange.amount_to_precision(symbol, raw_amount))
+        position_usdt = signal.position_size_usdt or self.settings.fixed_position_usdt
+        raw_amount = position_usdt / reference_price
+        return float(self.exchange.amount_to_precision(signal.pair, raw_amount))
 
     def _entry_price(self, signal: TradeSignal) -> float:
         if not signal.entry_zone:
@@ -99,6 +100,13 @@ class ExchangeExecutor:
             raise ValueError(
                 f"Leverage {signal.leverage} exceeds max leverage policy {self.settings.max_leverage}"
             )
+        if signal.position_size_usdt is not None:
+            if signal.position_size_usdt <= 0:
+                raise ValueError("Position size must be greater than 0")
+            if signal.position_size_usdt > self.settings.paper_total_balance_usdt:
+                raise ValueError(
+                    f"Position size exceeds paper balance {self.settings.paper_total_balance_usdt}"
+                )
 
         entry = self._entry_price(signal)
         if signal.direction == "LONG" and signal.stop_loss >= entry:

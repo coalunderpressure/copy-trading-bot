@@ -15,12 +15,15 @@ class BotApprovalService:
         approval_chat_id: Any,
         timeout_seconds: int = 180,
         max_leverage: int = 20,
+        total_balance_usdt: float = 50.0,
     ):
         self.approval_chat_id = approval_chat_id
         self.timeout_seconds = timeout_seconds
         self.max_leverage = max_leverage
+        self.total_balance_usdt = total_balance_usdt
         self.pending: Dict[int, asyncio.Future] = {}
         self.pending_signals: Dict[int, TradeSignal] = {}
+        self.pending_sizes: Dict[int, float] = {}
         self._lock = asyncio.Lock()
 
         self.application = Application.builder().token(bot_token).build()
@@ -28,6 +31,7 @@ class BotApprovalService:
         self.application.add_handler(CommandHandler("approve", self._on_approve))
         self.application.add_handler(CommandHandler("reject", self._on_reject))
         self.application.add_handler(CommandHandler("edit", self._on_edit))
+        self.application.add_handler(CommandHandler("size", self._on_size))
 
     async def start(self) -> None:
         await self.application.initialize()
@@ -74,6 +78,7 @@ class BotApprovalService:
             async with self._lock:
                 self.pending.pop(signal_id, None)
                 self.pending_signals.pop(signal_id, None)
+                self.pending_sizes.pop(signal_id, None)
 
     async def _on_button(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         query = update.callback_query
@@ -98,8 +103,17 @@ class BotApprovalService:
             return
 
         if action == "approve":
+            sized = self._apply_selected_size(signal_id, signal)
+            if sized is None:
+                await query.answer("Select size first")
+                return
             future.set_result(
-                ApprovalDecision(approved=True, reason="approved by button", tags=["approved", "button"])
+                ApprovalDecision(
+                    approved=True,
+                    reason="approved by button",
+                    edited_signal=sized,
+                    tags=["approved", "button"],
+                )
             )
             await query.answer("Approved")
             return
@@ -109,6 +123,16 @@ class BotApprovalService:
                 ApprovalDecision(approved=False, reason="rejected by button", tags=["rejected", "button"])
             )
             await query.answer("Rejected")
+            return
+
+        if action == "set_pct":
+            size = self._pct_to_size(payload)
+            if size is None:
+                await query.answer("Invalid size")
+                return
+            async with self._lock:
+                self.pending_sizes[signal_id] = size
+            await query.answer(f"Size set: {size:.2f} USDT")
             return
 
         if action == "edit":
@@ -122,19 +146,46 @@ class BotApprovalService:
         await query.answer("Unsupported action")
 
     async def _on_approve(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        await self._apply_command("/approve", context.args, update)
+        await self._apply_command("/approve", context.args, update, context)
 
     async def _on_reject(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        await self._apply_command("/reject", context.args, update)
+        await self._apply_command("/reject", context.args, update, context)
 
     async def _on_edit(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        await self._apply_command("/edit", context.args, update)
+        await self._apply_command("/edit", context.args, update, context)
+
+    async def _on_size(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        chat_id = update.effective_chat.id if update.effective_chat else None
+        if chat_id is None or str(chat_id) != str(self.approval_chat_id):
+            return
+        if len(context.args) < 2:
+            return
+        signal_id = self._parse_signal_id(context.args[0])
+        if signal_id is None:
+            return
+
+        parsed = self._parse_size_token(context.args[1])
+        if parsed is None:
+            return
+
+        async with self._lock:
+            future = self.pending.get(signal_id)
+        if future is None or future.done():
+            return
+
+        async with self._lock:
+            self.pending_sizes[signal_id] = parsed
+        await context.bot.send_message(
+            chat_id=self.approval_chat_id,
+            text=f"Size set for #{signal_id}: {parsed:.2f} USDT",
+        )
 
     async def _apply_command(
         self,
         command: str,
         args: list[str],
         update: Update,
+        context: ContextTypes.DEFAULT_TYPE,
     ) -> None:
         chat_id = update.effective_chat.id if update.effective_chat else None
         if chat_id is None or str(chat_id) != str(self.approval_chat_id):
@@ -149,8 +200,27 @@ class BotApprovalService:
             return
 
         if command == "/approve":
+            async with self._lock:
+                signal = self.pending_signals.get(signal_id)
+            if signal is None:
+                return
+            sized = self._apply_selected_size(signal_id, signal)
+            if sized is None:
+                await context.bot.send_message(
+                    chat_id=self.approval_chat_id,
+                    text=(
+                        f"Signal #{signal_id}: choose size first.\n"
+                        f"Use buttons or /size {signal_id} 20  (or /size {signal_id} 40%)"
+                    ),
+                )
+                return
             future.set_result(
-                ApprovalDecision(approved=True, reason="approved by user", tags=["approved"])
+                ApprovalDecision(
+                    approved=True,
+                    reason="approved by user",
+                    edited_signal=sized,
+                    tags=["approved"],
+                )
             )
             return
 
@@ -203,19 +273,38 @@ class BotApprovalService:
             f"SL: {signal.stop_loss}\n"
             f"Leverage: {signal.leverage}x\n"
             f"Margin: {signal.margin_mode}\n"
-            f"Order: {signal.order_type}\n\n"
+            f"Order: {signal.order_type}\n"
+            f"Paper balance: {self.total_balance_usdt:.2f} USDT\n\n"
+            "1) Select position size (buttons or /size)\n"
+            "2) Approve / Reject\n\n"
             "Use inline buttons below, or fallback commands:\n"
             f"/approve {signal_id}\n"
             f"/reject {signal_id} <reason>\n"
+            f"/size {signal_id} 20      (USDT)\n"
+            f"/size {signal_id} 40%     (percent of paper balance)\n"
             f"/edit {signal_id} leverage=10 margin_mode=isolated order_type=limit stop_loss=12345\n"
         )
 
     def _build_approval_keyboard(self, signal_id: int) -> InlineKeyboardMarkup:
+        pct25 = self.total_balance_usdt * 0.25
+        pct50 = self.total_balance_usdt * 0.50
+        pct100 = self.total_balance_usdt
         return InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton("Approve", callback_data=f"sig:{signal_id}:approve"),
                     InlineKeyboardButton("Reject", callback_data=f"sig:{signal_id}:reject"),
+                ],
+                [
+                    InlineKeyboardButton(
+                        f"25% ({pct25:.2f}u)", callback_data=f"sig:{signal_id}:set_pct:25"
+                    ),
+                    InlineKeyboardButton(
+                        f"50% ({pct50:.2f}u)", callback_data=f"sig:{signal_id}:set_pct:50"
+                    ),
+                    InlineKeyboardButton(
+                        f"100% ({pct100:.2f}u)", callback_data=f"sig:{signal_id}:set_pct:100"
+                    ),
                 ],
                 [
                     InlineKeyboardButton("Market", callback_data=f"sig:{signal_id}:edit:order_type=market"),
@@ -236,6 +325,37 @@ class BotApprovalService:
         action = parts[2]
         payload = parts[3] if len(parts) == 4 else ""
         return signal_id, action, payload
+
+    def _pct_to_size(self, value: str) -> Optional[float]:
+        try:
+            pct = float(value)
+        except ValueError:
+            return None
+        if pct <= 0:
+            return None
+        return self.total_balance_usdt * (pct / 100.0)
+
+    def _parse_size_token(self, token: str) -> Optional[float]:
+        raw = token.strip()
+        if not raw:
+            return None
+        if raw.endswith("%"):
+            return self._pct_to_size(raw[:-1])
+        try:
+            usdt = float(raw)
+        except ValueError:
+            return None
+        if usdt <= 0 or usdt > self.total_balance_usdt:
+            return None
+        return usdt
+
+    def _apply_selected_size(self, signal_id: int, signal: Optional[TradeSignal]) -> Optional[TradeSignal]:
+        if signal is None:
+            return None
+        size = self.pending_sizes.get(signal_id)
+        if size is None:
+            return None
+        return replace(signal, position_size_usdt=float(size))
 
     def _parse_signal_id(self, value: str) -> Optional[int]:
         try:

@@ -35,6 +35,7 @@ def _build_startup_message(settings, channel_label: str) -> str:
         f"📡 Source: {channel_label}\n"
         f"💬 Approval: {approval_label}\n"
         f"🧪 Mode: {mode_label}\n"
+        f"💵 Paper Balance: {settings.paper_total_balance_usdt:.2f} USDT\n"
         f"🏦 Exchange: {settings.exchange_name}\n"
         f"🕒 Started: {started_at_utc}"
     )
@@ -71,6 +72,7 @@ async def run() -> None:
         approval_chat_id=settings.approval_chat_id,
         timeout_seconds=settings.approval_timeout_seconds,
         max_leverage=settings.max_leverage,
+        total_balance_usdt=settings.paper_total_balance_usdt,
     )
     executor = ExchangeExecutor(settings=settings)
     state_store = SignalStateStore(db_path=settings.state_db_path)

@@ -39,6 +39,9 @@ def test_build_approval_keyboard_contains_expected_actions():
     ]
     assert "sig:42:approve" in callback_data
     assert "sig:42:reject" in callback_data
+    assert "sig:42:set_pct:25" in callback_data
+    assert "sig:42:set_pct:50" in callback_data
+    assert "sig:42:set_pct:100" in callback_data
     assert "sig:42:edit:order_type=market" in callback_data
     assert "sig:42:edit:leverage=5" in callback_data
     assert "sig:42:edit:leverage=10" in callback_data
@@ -52,3 +55,15 @@ def test_parse_callback_data():
     parsed = service._parse_callback_data("sig:99:edit:leverage=10")  # pylint: disable=protected-access
     assert parsed == (99, "edit", "leverage=10")
     assert service._parse_callback_data("bad:data") is None  # pylint: disable=protected-access
+
+
+def test_parse_size_token():
+    service = BotApprovalService(
+        bot_token="123:abc",
+        approval_chat_id=1,
+        total_balance_usdt=50.0,
+    )
+    assert service._parse_size_token("20") == 20.0  # pylint: disable=protected-access
+    assert service._parse_size_token("40%") == 20.0  # pylint: disable=protected-access
+    assert service._parse_size_token("0") is None  # pylint: disable=protected-access
+    assert service._parse_size_token("200") is None  # pylint: disable=protected-access

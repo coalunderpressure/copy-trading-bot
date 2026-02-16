@@ -22,6 +22,7 @@ Expected: output contains `status: ok` and `step: dry_run`.
 - `DRY_RUN=true`
 - `EXCHANGE_TESTNET=true`
 - `ALLOWED_PAIRS=BTC/USDT,ETH/USDT`
+- `PAPER_TOTAL_BALANCE_USDT=50`
 
 Hybrid not:
 - Kanal dinleme Telethon user session ile yapılır (kanala üye olan senin kullanıcı hesabın).
@@ -38,7 +39,9 @@ Hybrid not:
 ```
 
 4. Bot chatinde onay ver:
-- Tercih edilen: inline butonlar (`Approve`, `Reject`, `Market`, `5x`, `10x`)
+- Tercih edilen: önce pozisyon boyutu butonu (`25%`, `50%`, `100%`), sonra `Approve`
+- Özel boyut için: `/size <message_id> 20` veya `/size <message_id> 40%`
+- Diğer inline butonlar: `Reject`, `Market`, `5x`, `10x`
 - Fallback komutlar:
 `/approve <message_id>`
 `/reject <message_id> reason`

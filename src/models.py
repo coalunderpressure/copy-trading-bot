@@ -12,6 +12,7 @@ class TradeSignal:
     leverage: int = 5
     margin_mode: str = "isolated"
     order_type: str = "limit"
+    position_size_usdt: Optional[float] = None
     confidence: float = 0.0
     source_message_id: Optional[int] = None
     raw_text: str = ""

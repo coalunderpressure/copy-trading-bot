@@ -22,3 +22,4 @@
 - [x] ~~Onay UX'ini inline butonlarla iyileştir ve komutları fallback olarak koru (zorluk: orta, efor: medium)~~ (Core Builder)
 - [x] ~~Startup bildirimini estetik status kartı formatına geçir (zorluk: kolay, efor: low)~~ (Core Builder)
 - [x] ~~Startup kartını emoji'li ve ID göstermeyen formatta iyileştir; kanal adını çözümle (zorluk: kolay, efor: low)~~ (Core Builder)
+- [x] ~~Onay aşamasına zorunlu pozisyon boyutu seçimi ekle (% veya USDT) ve paper balance=50 akışını uygula (zorluk: orta, efor: medium)~~ (Core Builder)
