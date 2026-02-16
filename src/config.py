@@ -26,6 +26,8 @@ class Settings:
     max_leverage: int
     allowed_pairs: Optional[set[str]]
     state_db_path: str
+    executor_max_retries: int
+    executor_retry_delay_ms: int
 
 
 def _require(key: str) -> str:
@@ -62,4 +64,6 @@ def load_settings() -> Settings:
         max_leverage=int(os.getenv("MAX_LEVERAGE", "20")),
         allowed_pairs=allowed_pairs,
         state_db_path=os.getenv("STATE_DB_PATH", "data/state.db"),
+        executor_max_retries=int(os.getenv("EXECUTOR_MAX_RETRIES", "2")),
+        executor_retry_delay_ms=int(os.getenv("EXECUTOR_RETRY_DELAY_MS", "500")),
     )

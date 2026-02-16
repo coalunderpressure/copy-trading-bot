@@ -1,6 +1,8 @@
+import asyncio
 from typing import Any, Dict, List, Optional
 
 import ccxt.async_support as ccxt_async
+from ccxt.base.errors import DDoSProtection, ExchangeNotAvailable, NetworkError, RateLimitExceeded, RequestTimeout
 
 from src.config import Settings
 from src.models import TradeSignal
@@ -46,7 +48,7 @@ class ExchangeExecutor:
                 )
                 return {"status": "ok", "exchange": self.exchange_name, "actions": actions}
 
-            await self.exchange.load_markets()
+            await self._call_with_retry("load_markets", self.exchange.load_markets)
             await self._safe_set_leverage(signal, actions)
             await self._safe_set_margin_mode(signal, actions)
 
@@ -55,13 +57,16 @@ class ExchangeExecutor:
             amount = await self._calculate_amount(signal.pair, entry_price)
             order_type = "market" if signal.order_type == "market" else "limit"
 
-            order = await self.exchange.create_order(
-                symbol=signal.pair,
-                type=order_type,
-                side=side,
-                amount=amount,
-                price=None if order_type == "market" else entry_price,
-                params={},
+            order = await self._call_with_retry(
+                "create_entry_order",
+                lambda: self.exchange.create_order(
+                    symbol=signal.pair,
+                    type=order_type,
+                    side=side,
+                    amount=amount,
+                    price=None if order_type == "market" else entry_price,
+                    params={},
+                ),
             )
             actions.append({"step": "entry", "status": "ok", "id": order.get("id")})
 
@@ -76,7 +81,7 @@ class ExchangeExecutor:
         await self.exchange.close()
 
     async def _calculate_amount(self, symbol: str, entry_price: float) -> float:
-        ticker = await self.exchange.fetch_ticker(symbol)
+        ticker = await self._call_with_retry("fetch_ticker", lambda: self.exchange.fetch_ticker(symbol))
         reference_price = entry_price or float(ticker["last"])
         raw_amount = self.settings.fixed_position_usdt / reference_price
         return float(self.exchange.amount_to_precision(symbol, raw_amount))
@@ -106,7 +111,10 @@ class ExchangeExecutor:
             actions.append({"step": "set_leverage", "status": "skipped"})
             return
         try:
-            await self.exchange.set_leverage(signal.leverage, signal.pair)
+            await self._call_with_retry(
+                "set_leverage",
+                lambda: self.exchange.set_leverage(signal.leverage, signal.pair),
+            )
             actions.append({"step": "set_leverage", "status": "ok", "value": signal.leverage})
         except Exception as exc:
             actions.append({"step": "set_leverage", "status": "error", "error": str(exc)})
@@ -116,7 +124,10 @@ class ExchangeExecutor:
             actions.append({"step": "set_margin_mode", "status": "skipped"})
             return
         try:
-            await self.exchange.set_margin_mode(signal.margin_mode, signal.pair)
+            await self._call_with_retry(
+                "set_margin_mode",
+                lambda: self.exchange.set_margin_mode(signal.margin_mode, signal.pair),
+            )
             actions.append({"step": "set_margin_mode", "status": "ok", "value": signal.margin_mode})
         except Exception as exc:
             actions.append({"step": "set_margin_mode", "status": "error", "error": str(exc)})
@@ -127,13 +138,16 @@ class ExchangeExecutor:
         side = "sell" if signal.direction == "LONG" else "buy"
         params = {"reduceOnly": True, "stopPrice": signal.stop_loss}
         try:
-            order = await self.exchange.create_order(
-                symbol=signal.pair,
-                type="stop_market",
-                side=side,
-                amount=amount,
-                price=None,
-                params=params,
+            order = await self._call_with_retry(
+                "create_stop_loss_order",
+                lambda: self.exchange.create_order(
+                    symbol=signal.pair,
+                    type="stop_market",
+                    side=side,
+                    amount=amount,
+                    price=None,
+                    params=params,
+                ),
             )
             actions.append({"step": "stop_loss", "status": "ok", "id": order.get("id")})
         except Exception as exc:
@@ -150,14 +164,48 @@ class ExchangeExecutor:
         split_amount = amount / len(signal.targets)
         for tp in signal.targets:
             try:
-                order = await self.exchange.create_order(
-                    symbol=signal.pair,
-                    type="limit",
-                    side=side,
-                    amount=float(self.exchange.amount_to_precision(signal.pair, split_amount)),
-                    price=tp,
-                    params={"reduceOnly": True},
+                order = await self._call_with_retry(
+                    "create_take_profit_order",
+                    lambda: self.exchange.create_order(
+                        symbol=signal.pair,
+                        type="limit",
+                        side=side,
+                        amount=float(self.exchange.amount_to_precision(signal.pair, split_amount)),
+                        price=tp,
+                        params={"reduceOnly": True},
+                    ),
                 )
                 actions.append({"step": "take_profit", "status": "ok", "price": tp, "id": order.get("id")})
             except Exception as exc:
                 actions.append({"step": "take_profit", "status": "error", "price": tp, "error": str(exc)})
+
+    async def _call_with_retry(self, operation: str, fn):
+        attempts = max(1, self.settings.executor_max_retries + 1)
+        base_delay_seconds = max(0, self.settings.executor_retry_delay_ms) / 1000.0
+        last_exc: Optional[Exception] = None
+
+        for attempt in range(1, attempts + 1):
+            try:
+                return await fn()
+            except Exception as exc:
+                last_exc = exc
+                if not self._is_retryable(exc) or attempt == attempts:
+                    raise
+
+                delay = base_delay_seconds * attempt
+                if delay > 0:
+                    await asyncio.sleep(delay)
+
+        raise RuntimeError(f"{operation} failed without exception details") from last_exc
+
+    def _is_retryable(self, exc: Exception) -> bool:
+        retryable_types = (
+            NetworkError,
+            ExchangeNotAvailable,
+            RequestTimeout,
+            DDoSProtection,
+            RateLimitExceeded,
+            TimeoutError,
+            asyncio.TimeoutError,
+        )
+        return isinstance(exc, retryable_types)

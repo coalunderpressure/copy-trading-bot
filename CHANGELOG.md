@@ -7,6 +7,11 @@
 - Yeni ayar eklendi: `STATE_DB_PATH` (`src/config.py`, `.env.example`).
 - State store için unit testler eklendi: `tests/test_state_store.py`.
 - Testler çalıştırıldı: `.venv\\Scripts\\python -m pytest -q` sonucu `6 passed`.
+- Executor akışına transient hatalar için retry/backoff eklendi (`src/executor.py`).
+- Yeni retry ayarları eklendi: `EXECUTOR_MAX_RETRIES`, `EXECUTOR_RETRY_DELAY_MS` (`src/config.py`, `.env.example`).
+- Retry davranışı için unit testler eklendi: `tests/test_executor_retry.py`.
+- Smoke script `STATE_DB_PATH` ve retry ayarlarıyla güncellendi (`scripts/dry_run_smoke.py`).
+- Testler tekrar çalıştırıldı: `.venv\\Scripts\\python -m pytest -q` sonucu `9 passed`.
 
 ## 2026-02-15
 - Plan dokümanları konsolide edildi: `trading_bot_plan.md` master plan olarak güncellendi.

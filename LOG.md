@@ -26,3 +26,8 @@
 2026-02-16 23:43 — [Core Builder] `src/state_store.py` eklendi; sinyal yaşam döngüsü durumları SQLite üzerinde kalıcı hale getirildi.
 2026-02-16 23:43 — [Core Builder] `src/main.py` akışına duplicate mesaj engeli ve parse/approval/execution durum güncellemeleri bağlandı.
 2026-02-16 23:43 — [QA Planner] `tests/test_state_store.py` eklendi; `.venv\Scripts\python -m pytest -q` sonucu: 6 passed.
+2026-02-16 23:46 — [Orchestrator] Yeni görev tanımlandı: Executor retry/backoff hardening (zorluk: orta, efor: medium).
+2026-02-16 23:46 — [Core Builder] `src/executor.py` içinde transient exchange hataları için retry/backoff katmanı eklendi ve emir çağrılarına bağlandı.
+2026-02-16 23:46 — [Core Builder] `src/config.py` + `.env.example` üzerinden `EXECUTOR_MAX_RETRIES` ve `EXECUTOR_RETRY_DELAY_MS` ayarları eklendi.
+2026-02-16 23:46 — [QA Planner] `tests/test_executor_retry.py` eklendi; `.venv\Scripts\python -m pytest -q` sonucu: 9 passed.
+2026-02-16 23:46 — [QA Planner] `scripts/dry_run_smoke.py` çalıştırıldı; dry-run sonucu başarılı.

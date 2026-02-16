@@ -42,6 +42,9 @@ async def main() -> None:
         dry_run=True,
         max_leverage=20,
         allowed_pairs={"BTC/USDT", "ETH/USDT"},
+        state_db_path="data/state.db",
+        executor_max_retries=2,
+        executor_retry_delay_ms=500,
     )
     executor = ExchangeExecutor(settings=settings)
     try:
