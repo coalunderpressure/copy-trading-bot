@@ -19,8 +19,13 @@
 - Regresyon testleri tekrar çalıştırıldı: `.venv\\Scripts\\python -m pytest -q` sonucu `9 passed`.
 - Bot-token tabanlı başlatma eklendi: `client.start(bot_token=...)` (`src/main.py`).
 - Yeni zorunlu env alanı eklendi: `TELEGRAM_BOT_TOKEN` (`src/config.py`, `.env.example`).
-- Bot-token mimarisine göre runbook güncellendi; botun hedef kanala eklenmesi/yetkilendirilmesi notu eklendi (`RUNBOOK.md`).
+- Bot-token mimarisine göre runbook güncellendi (`RUNBOOK.md`).
 - Regresyon + smoke doğrulaması tekrar çalıştırıldı: `pytest` sonucu `9 passed`, `scripts/dry_run_smoke.py` başarılı.
+- Hibrit mimari eklendi: kanal dinleme Telethon user session, onay/komut ve bildirim akışı Bot API üzerinden (`src/main.py`, `src/bot_approvals.py`).
+- Bot onay servisi eklendi: `/approve`, `/reject`, `/edit` komutları bot chatinde polling ile işleniyor (`src/bot_approvals.py`).
+- Chat hedef parse desteği eklendi (`-100...` veya username): `src/config.py`.
+- Runbook hibrit gerçekliğe göre güncellendi; botun kanalda olma zorunluluğu kaldırıldı, `/start` + `APPROVAL_CHAT_ID` gereksinimi netleştirildi (`RUNBOOK.md`).
+- Yeni test eklendi: `tests/test_bot_approvals.py`; test sonucu `10 passed`.
 
 ## 2026-02-15
 - Plan dokümanları konsolide edildi: `trading_bot_plan.md` master plan olarak güncellendi.

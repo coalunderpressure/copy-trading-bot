@@ -42,3 +42,9 @@
 2026-02-17 00:03 — [Core Builder] `src/config.py` ve `.env.example` dosyalarına zorunlu `TELEGRAM_BOT_TOKEN` alanı eklendi.
 2026-02-17 00:03 — [Core Builder] `RUNBOOK.md` kanal tarafında bot yetkilendirme (admin) ve aynı chat onay akışıyla güncellendi.
 2026-02-17 00:03 — [QA Planner] Regresyon + smoke doğrulaması tamamlandı: `pytest` sonucu `9 passed`, `scripts/dry_run_smoke.py` sonucu başarılı.
+2026-02-17 00:10 — [Orchestrator] Yeni görev tanımlandı: Hibrit mimariye geçiş (Telethon listener + Bot API onay/chat) (zorluk: zor, efor: high).
+2026-02-17 00:10 — [Core Builder] `src/bot_approvals.py` eklendi; `/approve`, `/reject`, `/edit` komutları Bot API polling ile yönetilir hale getirildi.
+2026-02-17 00:10 — [Core Builder] `src/main.py` hibrit akışa geçirildi: kanal dinleme user session üzerinden, onay/sonuç mesajları bot chat üzerinden.
+2026-02-17 00:10 — [Core Builder] `src/config.py` chat target parse desteğiyle güncellendi (`-100...` id veya username).
+2026-02-17 00:10 — [QA Planner] Yeni test eklendi: `tests/test_bot_approvals.py`; regresyon sonucu `.venv\Scripts\python -m pytest -q` -> `10 passed`.
+2026-02-17 00:10 — [QA Planner] Smoke doğrulaması tekrar çalıştırıldı: `scripts/dry_run_smoke.py` başarılı.

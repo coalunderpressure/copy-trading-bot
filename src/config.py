@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 
 from dotenv import load_dotenv
 
@@ -11,8 +11,8 @@ class Settings:
     telegram_api_hash: str
     telegram_bot_token: str
     telegram_session_name: str
-    telegram_channel_id: int
-    approval_chat_id: str
+    telegram_channel_id: Union[int, str]
+    approval_chat_id: Union[int, str]
     approval_timeout_seconds: int
     openai_api_key: str
     openai_model: str
@@ -38,6 +38,15 @@ def _require(key: str) -> str:
     return value
 
 
+def _parse_chat_target(value: str) -> Union[int, str]:
+    text = value.strip()
+    if not text:
+        raise ValueError("Chat target cannot be empty")
+    if text.lstrip("-").isdigit():
+        return int(text)
+    return text
+
+
 def load_settings() -> Settings:
     load_dotenv()
     allowed_pairs_raw = os.getenv("ALLOWED_PAIRS", "").strip()
@@ -50,8 +59,8 @@ def load_settings() -> Settings:
         telegram_api_hash=_require("TELEGRAM_API_HASH"),
         telegram_bot_token=_require("TELEGRAM_BOT_TOKEN"),
         telegram_session_name=os.getenv("TELEGRAM_SESSION_NAME", "copy_trading_userbot"),
-        telegram_channel_id=int(_require("TELEGRAM_CHANNEL_ID")),
-        approval_chat_id=os.getenv("APPROVAL_CHAT_ID", "me"),
+        telegram_channel_id=_parse_chat_target(_require("TELEGRAM_CHANNEL_ID")),
+        approval_chat_id=_parse_chat_target(_require("APPROVAL_CHAT_ID")),
         approval_timeout_seconds=int(os.getenv("APPROVAL_TIMEOUT_SECONDS", "180")),
         openai_api_key=_require("OPENAI_API_KEY"),
         openai_model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
