@@ -20,3 +20,4 @@
 - [x] ~~Userbot girişini bot-token tabanlı çalışmaya çevir ve runbook'u güncelle (zorluk: orta, efor: medium)~~ (Core Builder)
 - [x] ~~Mimariyi hibrit moda çevir: Telethon user listener + Bot API onay/chat akışı (zorluk: zor, efor: high)~~ (Core Builder)
 - [x] ~~Onay UX'ini inline butonlarla iyileştir ve komutları fallback olarak koru (zorluk: orta, efor: medium)~~ (Core Builder)
+- [x] ~~Startup bildirimini estetik status kartı formatına geçir (zorluk: kolay, efor: low)~~ (Core Builder)

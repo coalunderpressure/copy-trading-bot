@@ -52,3 +52,6 @@
 2026-02-17 00:37 — [Core Builder] `src/bot_approvals.py` dosyasına inline keyboard + callback query handler eklendi (`Approve/Reject/Market/5x/10x`).
 2026-02-17 00:37 — [Core Builder] Komut akışı (`/approve`, `/reject`, `/edit`) fallback olarak korundu.
 2026-02-17 00:37 — [QA Planner] `tests/test_bot_approvals.py` genişletildi (keyboard callback data + parse testleri); `pytest` sonucu `12 passed`.
+2026-02-17 00:39 — [Orchestrator] Yeni görev tanımlandı: startup bildirimi sade mesajdan estetik status kartına taşınacak (zorluk: kolay, efor: low).
+2026-02-17 00:39 — [Core Builder] `src/main.py` başlangıç bildirimi güncellendi; tek satır "Hybrid mode" yerine durum kartı (start time, listener, approval, mode, exchange) gönderiliyor.
+2026-02-17 00:39 — [QA Planner] Regresyon testleri tekrar çalıştırıldı: `.venv\Scripts\python -m pytest -q` sonucu `12 passed`.

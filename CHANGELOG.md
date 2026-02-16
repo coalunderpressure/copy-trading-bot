@@ -29,6 +29,8 @@
 - Approval UX inline butonlarla iyileştirildi: `Approve`, `Reject`, `Market`, `5x`, `10x` (`src/bot_approvals.py`).
 - Callback query işleme eklendi; komutlar fallback olarak korundu (`src/bot_approvals.py`).
 - Bot approval testleri genişletildi: keyboard/callback-data doğrulaması (`tests/test_bot_approvals.py`), test sonucu `12 passed`.
+- Startup bildirimi sade "Hybrid mode active" metninden estetik bir durum kartına geçirildi (`src/main.py`).
+- Başlangıç kartında `Started`, `Listener channel`, `Approval chat`, `Mode`, `Exchange` bilgileri gösteriliyor.
 
 ## 2026-02-15
 - Plan dokümanları konsolide edildi: `trading_bot_plan.md` master plan olarak güncellendi.

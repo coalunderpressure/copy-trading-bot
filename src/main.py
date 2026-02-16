@@ -1,5 +1,6 @@
 import asyncio
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 from src.bot_approvals import BotApprovalService
@@ -8,6 +9,19 @@ from src.executor import ExchangeExecutor
 from src.listener import IncomingMessage, create_client, register_channel_handler
 from src.parser import SignalParser
 from src.state_store import SignalStateStore
+
+
+def _build_startup_message(settings) -> str:
+    started_at_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    return (
+        "Copy Trading Bot online\n"
+        "----------------------\n"
+        f"Started: {started_at_utc}\n"
+        f"Listener channel: {settings.telegram_channel_id}\n"
+        f"Approval chat: {settings.approval_chat_id}\n"
+        f"Mode: {'DRY_RUN' if settings.dry_run else 'LIVE'}\n"
+        f"Exchange: {settings.exchange_name}\n"
+    )
 
 
 async def run() -> None:
@@ -59,7 +73,7 @@ async def run() -> None:
     register_channel_handler(user_client, settings, on_message)
     await user_client.start()
     try:
-        await approvals.send_message("Hybrid mode active: Telethon listener + bot approvals.")
+        await approvals.send_message(_build_startup_message(settings))
         await user_client.run_until_disconnected()
     finally:
         await approvals.stop()
