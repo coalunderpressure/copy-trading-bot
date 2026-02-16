@@ -31,3 +31,6 @@
 2026-02-16 23:46 — [Core Builder] `src/config.py` + `.env.example` üzerinden `EXECUTOR_MAX_RETRIES` ve `EXECUTOR_RETRY_DELAY_MS` ayarları eklendi.
 2026-02-16 23:46 — [QA Planner] `tests/test_executor_retry.py` eklendi; `.venv\Scripts\python -m pytest -q` sonucu: 9 passed.
 2026-02-16 23:46 — [QA Planner] `scripts/dry_run_smoke.py` çalıştırıldı; dry-run sonucu başarılı.
+2026-02-16 23:48 — [QA Planner] UAT doğrulama senaryosu parser+executor+state-store hattında çalıştırıldı; sonuç `execution_status: ok`, `final_state: executed`.
+2026-02-16 23:48 — [QA Planner] `data/state.db` üzerinde `source_message_id=9001` kaydı doğrulandı; durum kalıcılığı teyit edildi.
+2026-02-16 23:48 — [Security Guardian] Runtime artefaktlarının yanlışlıkla commitlenmesini önlemek için `.gitignore` güncellendi (`data/*.db`, `logs/`, `downloads/`).

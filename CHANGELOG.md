@@ -12,6 +12,8 @@
 - Retry davranışı için unit testler eklendi: `tests/test_executor_retry.py`.
 - Smoke script `STATE_DB_PATH` ve retry ayarlarıyla güncellendi (`scripts/dry_run_smoke.py`).
 - Testler tekrar çalıştırıldı: `.venv\\Scripts\\python -m pytest -q` sonucu `9 passed`.
+- Dry-run UAT state doğrulaması çalıştırıldı; `data/state.db` üzerinde `executed` durum kaydı teyit edildi.
+- Runtime artefaktları için `.gitignore` güncellendi: `data/*.db`, `logs/`, `downloads/`.
 
 ## 2026-02-15
 - Plan dokümanları konsolide edildi: `trading_bot_plan.md` master plan olarak güncellendi.

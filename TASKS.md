@@ -15,3 +15,4 @@
 - [x] ~~Gerçek Telegram dry-run UAT için çalıştırma runbook'u hazırla~~ (Orchestrator)
 - [x] ~~SQLite tabanlı state store ve idempotency kontrolünü ana akışa ekle (zorluk: orta, efor: medium)~~ (Core Builder)
 - [x] ~~Executor için transient hata retry/backoff mekanizması ekle ve test et (zorluk: orta, efor: medium)~~ (Core Builder)
+- [x] ~~Dry-run UAT state doğrulamasını yap ve SQLite kayıtlarını teyit et (zorluk: kolay, efor: low)~~ (QA Planner)
