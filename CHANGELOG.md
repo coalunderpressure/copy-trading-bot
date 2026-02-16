@@ -31,6 +31,9 @@
 - Bot approval testleri genişletildi: keyboard/callback-data doğrulaması (`tests/test_bot_approvals.py`), test sonucu `12 passed`.
 - Startup bildirimi sade "Hybrid mode active" metninden estetik bir durum kartına geçirildi (`src/main.py`).
 - Başlangıç kartında `Started`, `Listener channel`, `Approval chat`, `Mode`, `Exchange` bilgileri gösteriliyor.
+- Startup kartı emoji'li bir UX formatına güncellendi (`src/main.py`).
+- Kanal etiketi entity'den çözümlenerek ad/username gösteriliyor; ham chat ID görünümü kaldırıldı (`src/main.py`).
+- Approval chat alanı ID yerine kullanıcı dostu etiketle gösteriliyor (`src/main.py`).
 
 ## 2026-02-15
 - Plan dokümanları konsolide edildi: `trading_bot_plan.md` master plan olarak güncellendi.

@@ -2,6 +2,7 @@ import asyncio
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 from src.bot_approvals import BotApprovalService
 from src.config import load_settings
@@ -11,17 +12,54 @@ from src.parser import SignalParser
 from src.state_store import SignalStateStore
 
 
-def _build_startup_message(settings) -> str:
+def _display_chat_label(chat_target: Any) -> str:
+    if isinstance(chat_target, str):
+        value = chat_target.strip()
+        if not value:
+            return "Configured chat"
+        if value.lower() == "me":
+            return "Saved Messages"
+        if value.lstrip("-").isdigit():
+            return "Configured private chat"
+        return value if value.startswith("@") else f"@{value}"
+    return "Configured private chat"
+
+
+def _build_startup_message(settings, channel_label: str) -> str:
     started_at_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    mode_label = "Dry Run" if settings.dry_run else "Live Trading"
+    approval_label = _display_chat_label(settings.approval_chat_id)
     return (
-        "Copy Trading Bot online\n"
-        "----------------------\n"
-        f"Started: {started_at_utc}\n"
-        f"Listener channel: {settings.telegram_channel_id}\n"
-        f"Approval chat: {settings.approval_chat_id}\n"
-        f"Mode: {'DRY_RUN' if settings.dry_run else 'LIVE'}\n"
-        f"Exchange: {settings.exchange_name}\n"
+        "🟢 Copy Trading Bot is online\n"
+        "━━━━━━━━━━━━━━━━━━━━\n"
+        f"📡 Source: {channel_label}\n"
+        f"💬 Approval: {approval_label}\n"
+        f"🧪 Mode: {mode_label}\n"
+        f"🏦 Exchange: {settings.exchange_name}\n"
+        f"🕒 Started: {started_at_utc}"
     )
+
+
+async def _resolve_channel_label(user_client, channel_target: Any) -> str:
+    if isinstance(channel_target, str) and channel_target.lower() == "me":
+        return "Saved Messages"
+    try:
+        entity = await user_client.get_entity(channel_target)
+    except Exception:
+        if isinstance(channel_target, str):
+            return channel_target if channel_target.startswith("@") else f"@{channel_target}"
+        return "Configured channel"
+
+    username = getattr(entity, "username", None)
+    if username:
+        return f"@{username}"
+    title = getattr(entity, "title", None)
+    if title:
+        return title
+    first_name = getattr(entity, "first_name", None)
+    if first_name:
+        return first_name
+    return "Configured channel"
 
 
 async def run() -> None:
@@ -73,7 +111,8 @@ async def run() -> None:
     register_channel_handler(user_client, settings, on_message)
     await user_client.start()
     try:
-        await approvals.send_message(_build_startup_message(settings))
+        channel_label = await _resolve_channel_label(user_client, settings.telegram_channel_id)
+        await approvals.send_message(_build_startup_message(settings, channel_label))
         await user_client.run_until_disconnected()
     finally:
         await approvals.stop()

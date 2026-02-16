@@ -55,3 +55,6 @@
 2026-02-17 00:39 — [Orchestrator] Yeni görev tanımlandı: startup bildirimi sade mesajdan estetik status kartına taşınacak (zorluk: kolay, efor: low).
 2026-02-17 00:39 — [Core Builder] `src/main.py` başlangıç bildirimi güncellendi; tek satır "Hybrid mode" yerine durum kartı (start time, listener, approval, mode, exchange) gönderiliyor.
 2026-02-17 00:39 — [QA Planner] Regresyon testleri tekrar çalıştırıldı: `.venv\Scripts\python -m pytest -q` sonucu `12 passed`.
+2026-02-17 00:42 — [Orchestrator] Yeni görev tanımlandı: startup kartını emoji'li ve ID göstermeyen UX'e geçir (zorluk: kolay, efor: low).
+2026-02-17 00:42 — [Core Builder] `src/main.py` startup kartı emoji'li stile güncellendi; approval chat ID görünümü kaldırıldı, kanal etiketi entity üzerinden çözümleniyor.
+2026-02-17 00:42 — [QA Planner] Regresyon testleri tekrar çalıştırıldı: `.venv\Scripts\python -m pytest -q` sonucu `12 passed`.
