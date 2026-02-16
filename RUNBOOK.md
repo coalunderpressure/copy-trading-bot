@@ -37,10 +37,12 @@ Hybrid not:
 {"pair":"BTC/USDT","direction":"LONG","entry_zone":[50000,50100],"targets":[50500,51000],"stop_loss":49500,"leverage":5,"margin_mode":"isolated","order_type":"limit","confidence":0.8}
 ```
 
-4. Bot chatinde respond et:
-- `/approve <message_id>`
-- `/reject <message_id> reason`
-- `/edit <message_id> leverage=10 margin_mode=cross order_type=market stop_loss=49400`
+4. Bot chatinde onay ver:
+- Tercih edilen: inline butonlar (`Approve`, `Reject`, `Market`, `5x`, `10x`)
+- Fallback komutlar:
+`/approve <message_id>`
+`/reject <message_id> reason`
+`/edit <message_id> leverage=10 margin_mode=cross order_type=market stop_loss=49400`
 
 5. Verify:
 - `logs/raw_messages.jsonl` updated.

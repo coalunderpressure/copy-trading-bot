@@ -48,3 +48,7 @@
 2026-02-17 00:10 — [Core Builder] `src/config.py` chat target parse desteğiyle güncellendi (`-100...` id veya username).
 2026-02-17 00:10 — [QA Planner] Yeni test eklendi: `tests/test_bot_approvals.py`; regresyon sonucu `.venv\Scripts\python -m pytest -q` -> `10 passed`.
 2026-02-17 00:10 — [QA Planner] Smoke doğrulaması tekrar çalıştırıldı: `scripts/dry_run_smoke.py` başarılı.
+2026-02-17 00:37 — [Orchestrator] Yeni görev tanımlandı: approval UX'i inline butonlara taşınacak (zorluk: orta, efor: medium).
+2026-02-17 00:37 — [Core Builder] `src/bot_approvals.py` dosyasına inline keyboard + callback query handler eklendi (`Approve/Reject/Market/5x/10x`).
+2026-02-17 00:37 — [Core Builder] Komut akışı (`/approve`, `/reject`, `/edit`) fallback olarak korundu.
+2026-02-17 00:37 — [QA Planner] `tests/test_bot_approvals.py` genişletildi (keyboard callback data + parse testleri); `pytest` sonucu `12 passed`.

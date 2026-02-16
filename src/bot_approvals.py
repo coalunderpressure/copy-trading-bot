@@ -1,9 +1,9 @@
 import asyncio
 from dataclasses import replace
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
-from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 from src.models import ApprovalDecision, TradeSignal
 
@@ -24,6 +24,7 @@ class BotApprovalService:
         self._lock = asyncio.Lock()
 
         self.application = Application.builder().token(bot_token).build()
+        self.application.add_handler(CallbackQueryHandler(self._on_button))
         self.application.add_handler(CommandHandler("approve", self._on_approve))
         self.application.add_handler(CommandHandler("reject", self._on_reject))
         self.application.add_handler(CommandHandler("edit", self._on_edit))
@@ -53,7 +54,11 @@ class BotApprovalService:
             self.pending[signal_id] = future
             self.pending_signals[signal_id] = signal
 
-        await self.send_message(self._format_prompt(signal, signal_id))
+        await self.application.bot.send_message(
+            chat_id=self.approval_chat_id,
+            text=self._format_prompt(signal, signal_id),
+            reply_markup=self._build_approval_keyboard(signal_id),
+        )
 
         try:
             decision: ApprovalDecision = await asyncio.wait_for(future, timeout=self.timeout_seconds)
@@ -69,6 +74,52 @@ class BotApprovalService:
             async with self._lock:
                 self.pending.pop(signal_id, None)
                 self.pending_signals.pop(signal_id, None)
+
+    async def _on_button(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        query = update.callback_query
+        if query is None:
+            return
+        chat_id = query.message.chat_id if query.message else None
+        if chat_id is None or str(chat_id) != str(self.approval_chat_id):
+            await query.answer()
+            return
+
+        parsed = self._parse_callback_data(query.data or "")
+        if parsed is None:
+            await query.answer("Unknown action")
+            return
+        signal_id, action, payload = parsed
+
+        async with self._lock:
+            future = self.pending.get(signal_id)
+            signal = self.pending_signals.get(signal_id)
+        if future is None or future.done():
+            await query.answer("Signal no longer pending")
+            return
+
+        if action == "approve":
+            future.set_result(
+                ApprovalDecision(approved=True, reason="approved by button", tags=["approved", "button"])
+            )
+            await query.answer("Approved")
+            return
+
+        if action == "reject":
+            future.set_result(
+                ApprovalDecision(approved=False, reason="rejected by button", tags=["rejected", "button"])
+            )
+            await query.answer("Rejected")
+            return
+
+        if action == "edit":
+            if signal is None:
+                await query.answer("Signal not found")
+                return
+            future.set_result(self.build_edit_decision(signal, payload))
+            await query.answer("Approved with edit")
+            return
+
+        await query.answer("Unsupported action")
 
     async def _on_approve(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await self._apply_command("/approve", context.args, update)
@@ -153,11 +204,38 @@ class BotApprovalService:
             f"Leverage: {signal.leverage}x\n"
             f"Margin: {signal.margin_mode}\n"
             f"Order: {signal.order_type}\n\n"
-            "Commands:\n"
+            "Use inline buttons below, or fallback commands:\n"
             f"/approve {signal_id}\n"
             f"/reject {signal_id} <reason>\n"
             f"/edit {signal_id} leverage=10 margin_mode=isolated order_type=limit stop_loss=12345\n"
         )
+
+    def _build_approval_keyboard(self, signal_id: int) -> InlineKeyboardMarkup:
+        return InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("Approve", callback_data=f"sig:{signal_id}:approve"),
+                    InlineKeyboardButton("Reject", callback_data=f"sig:{signal_id}:reject"),
+                ],
+                [
+                    InlineKeyboardButton("Market", callback_data=f"sig:{signal_id}:edit:order_type=market"),
+                    InlineKeyboardButton("5x", callback_data=f"sig:{signal_id}:edit:leverage=5"),
+                    InlineKeyboardButton("10x", callback_data=f"sig:{signal_id}:edit:leverage=10"),
+                ],
+            ]
+        )
+
+    def _parse_callback_data(self, data: str) -> Optional[Tuple[int, str, str]]:
+        # Format: sig:<signal_id>:<action>[:<payload>]
+        parts = data.split(":", 3)
+        if len(parts) < 3 or parts[0] != "sig":
+            return None
+        signal_id = self._parse_signal_id(parts[1])
+        if signal_id is None:
+            return None
+        action = parts[2]
+        payload = parts[3] if len(parts) == 4 else ""
+        return signal_id, action, payload
 
     def _parse_signal_id(self, value: str) -> Optional[int]:
         try:

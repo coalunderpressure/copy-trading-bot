@@ -26,6 +26,9 @@
 - Chat hedef parse desteği eklendi (`-100...` veya username): `src/config.py`.
 - Runbook hibrit gerçekliğe göre güncellendi; botun kanalda olma zorunluluğu kaldırıldı, `/start` + `APPROVAL_CHAT_ID` gereksinimi netleştirildi (`RUNBOOK.md`).
 - Yeni test eklendi: `tests/test_bot_approvals.py`; test sonucu `10 passed`.
+- Approval UX inline butonlarla iyileştirildi: `Approve`, `Reject`, `Market`, `5x`, `10x` (`src/bot_approvals.py`).
+- Callback query işleme eklendi; komutlar fallback olarak korundu (`src/bot_approvals.py`).
+- Bot approval testleri genişletildi: keyboard/callback-data doğrulaması (`tests/test_bot_approvals.py`), test sonucu `12 passed`.
 
 ## 2026-02-15
 - Plan dokümanları konsolide edildi: `trading_bot_plan.md` master plan olarak güncellendi.
