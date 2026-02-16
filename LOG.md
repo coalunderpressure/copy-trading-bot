@@ -37,3 +37,8 @@
 2026-02-16 23:53 — [Core Builder] Onay akışı sinyalin geldiği chat'e yönlendirildi; prompt/sonuç/reject/duplicate mesajları artık `msg.chat_id` üzerinden gidiyor.
 2026-02-16 23:53 — [Core Builder] Approval handler global dinlemeye alındı; komutlar sadece ilgili sinyalin beklediği chat'ten gelirse kabul ediliyor.
 2026-02-16 23:53 — [QA Planner] Regresyon testleri çalıştırıldı: `.venv\Scripts\python -m pytest -q` sonucu `9 passed`.
+2026-02-17 00:03 — [Orchestrator] Yeni görev tanımlandı: bot-token tabanlı çalışma moduna geçiş (zorluk: orta, efor: medium).
+2026-02-17 00:03 — [Core Builder] `src/main.py` bot başlangıcı `client.start(bot_token=...)` olacak şekilde güncellendi.
+2026-02-17 00:03 — [Core Builder] `src/config.py` ve `.env.example` dosyalarına zorunlu `TELEGRAM_BOT_TOKEN` alanı eklendi.
+2026-02-17 00:03 — [Core Builder] `RUNBOOK.md` kanal tarafında bot yetkilendirme (admin) ve aynı chat onay akışıyla güncellendi.
+2026-02-17 00:03 — [QA Planner] Regresyon + smoke doğrulaması tamamlandı: `pytest` sonucu `9 passed`, `scripts/dry_run_smoke.py` sonucu başarılı.

@@ -18,6 +18,7 @@ def _settings() -> Settings:
     return Settings(
         telegram_api_id=1,
         telegram_api_hash="x",
+        telegram_bot_token="x:y",
         telegram_session_name="test",
         telegram_channel_id=1,
         approval_chat_id="me",

@@ -63,7 +63,7 @@ async def run() -> None:
         await client.send_message(msg.chat_id, f"Execution result: {result}")
 
     register_channel_handler(client, settings, on_message)
-    await client.start()
+    await client.start(bot_token=settings.telegram_bot_token)
     try:
         await client.run_until_disconnected()
     finally:

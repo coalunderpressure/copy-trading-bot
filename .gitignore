@@ -16,3 +16,4 @@ venv/
 data/*.db
 logs/
 downloads/
+*.session

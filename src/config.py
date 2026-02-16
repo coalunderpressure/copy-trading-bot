@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 class Settings:
     telegram_api_id: int
     telegram_api_hash: str
+    telegram_bot_token: str
     telegram_session_name: str
     telegram_channel_id: int
     approval_chat_id: str
@@ -47,6 +48,7 @@ def load_settings() -> Settings:
     return Settings(
         telegram_api_id=int(_require("TELEGRAM_API_ID")),
         telegram_api_hash=_require("TELEGRAM_API_HASH"),
+        telegram_bot_token=_require("TELEGRAM_BOT_TOKEN"),
         telegram_session_name=os.getenv("TELEGRAM_SESSION_NAME", "copy_trading_userbot"),
         telegram_channel_id=int(_require("TELEGRAM_CHANNEL_ID")),
         approval_chat_id=os.getenv("APPROVAL_CHAT_ID", "me"),

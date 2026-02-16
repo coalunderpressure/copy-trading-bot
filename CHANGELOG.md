@@ -17,6 +17,10 @@
 - Onay mesaj/komut akışı statik `APPROVAL_CHAT_ID` yerine sinyalin geldiği chat'e yönlendirildi (`src/main.py`, `src/approvals.py`).
 - Approval komutları sadece ilgili sinyalin beklenen chat'inden geldiğinde işleniyor (`src/approvals.py`).
 - Regresyon testleri tekrar çalıştırıldı: `.venv\\Scripts\\python -m pytest -q` sonucu `9 passed`.
+- Bot-token tabanlı başlatma eklendi: `client.start(bot_token=...)` (`src/main.py`).
+- Yeni zorunlu env alanı eklendi: `TELEGRAM_BOT_TOKEN` (`src/config.py`, `.env.example`).
+- Bot-token mimarisine göre runbook güncellendi; botun hedef kanala eklenmesi/yetkilendirilmesi notu eklendi (`RUNBOOK.md`).
+- Regresyon + smoke doğrulaması tekrar çalıştırıldı: `pytest` sonucu `9 passed`, `scripts/dry_run_smoke.py` başarılı.
 
 ## 2026-02-15
 - Plan dokümanları konsolide edildi: `trading_bot_plan.md` master plan olarak güncellendi.
