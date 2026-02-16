@@ -22,3 +22,7 @@
 2026-02-15 20:58 — [Core Builder] `scripts/dry_run_smoke.py` eklendi; ilk koşuda `src` import yolu hatası alındı ve path bootstrap ile düzeltildi.
 2026-02-15 20:58 — [Core Builder] Smoke script tekrar çalıştırıldı, dry-run sonucu başarılı.
 2026-02-15 20:58 — [Orchestrator] Gerçek Telegram dry-run UAT adımları `RUNBOOK.md` dosyasına eklendi.
+2026-02-16 23:43 — [Orchestrator] Yeni görev tanımlandı: SQLite state store + idempotency entegrasyonu (zorluk: orta, efor: medium).
+2026-02-16 23:43 — [Core Builder] `src/state_store.py` eklendi; sinyal yaşam döngüsü durumları SQLite üzerinde kalıcı hale getirildi.
+2026-02-16 23:43 — [Core Builder] `src/main.py` akışına duplicate mesaj engeli ve parse/approval/execution durum güncellemeleri bağlandı.
+2026-02-16 23:43 — [QA Planner] `tests/test_state_store.py` eklendi; `.venv\Scripts\python -m pytest -q` sonucu: 6 passed.

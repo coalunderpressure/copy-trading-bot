@@ -25,6 +25,7 @@ class Settings:
     dry_run: bool
     max_leverage: int
     allowed_pairs: Optional[set[str]]
+    state_db_path: str
 
 
 def _require(key: str) -> str:
@@ -60,4 +61,5 @@ def load_settings() -> Settings:
         dry_run=os.getenv("DRY_RUN", "true").lower() == "true",
         max_leverage=int(os.getenv("MAX_LEVERAGE", "20")),
         allowed_pairs=allowed_pairs,
+        state_db_path=os.getenv("STATE_DB_PATH", "data/state.db"),
     )

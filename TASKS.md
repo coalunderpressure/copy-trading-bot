@@ -13,3 +13,4 @@
 - [x] ~~`DRY_RUN` executor yürüyüş kontrolünü örnek sinyalle doğrula~~ (Core Builder)
 - [x] ~~Telegram öncesi otomatik dry-run smoke scripti ekle ve çalıştır~~ (Core Builder)
 - [x] ~~Gerçek Telegram dry-run UAT için çalıştırma runbook'u hazırla~~ (Orchestrator)
+- [x] ~~SQLite tabanlı state store ve idempotency kontrolünü ana akışa ekle (zorluk: orta, efor: medium)~~ (Core Builder)

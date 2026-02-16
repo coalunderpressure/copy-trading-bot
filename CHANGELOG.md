@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-02-16
+- SQLite tabanlı durum saklama katmanı eklendi: `src/state_store.py`.
+- Ana mesaj akışına idempotency koruması eklendi; aynı Telegram mesajı tekrar işlenmiyor (`src/main.py`).
+- Sinyal yaşam döngüsü kayıtları kalıcı hale getirildi: `received`, `parsed`, `approved/rejected`, `executed/execution_error`.
+- Yeni ayar eklendi: `STATE_DB_PATH` (`src/config.py`, `.env.example`).
+- State store için unit testler eklendi: `tests/test_state_store.py`.
+- Testler çalıştırıldı: `.venv\\Scripts\\python -m pytest -q` sonucu `6 passed`.
+
 ## 2026-02-15
 - Plan dokümanları konsolide edildi: `trading_bot_plan.md` master plan olarak güncellendi.
 - `telegram-trading-bot-implementation-roadmap.md` birleşim notu dosyasına dönüştürüldü.
